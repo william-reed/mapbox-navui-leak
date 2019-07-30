@@ -20,3 +20,132 @@ Since the `Observer` is never killed, and it is created every time we create the
 2. For the memory leak a weak reference is probably a good way to just avoid this situation in the presenter
 
 I would have just taken a shot at implementing these instead but I can't seem to find any documentation for building from source (as the main `README.md` suggests existence of).
+
+## Leak:
+```
+ ┬
+ ├─ android.view.inputmethod.InputMethodManager
+ │    Leaking: NO (it's a GC root and a class is never leaking)
+ │    ↓ static InputMethodManager.sInstance
+ ├─ android.view.inputmethod.InputMethodManager
+ │    Leaking: NO (DecorView↓ is not leaking and InputMethodManager is a singleton)
+ │    ↓ InputMethodManager.mNextServedView
+ ├─ com.android.internal.policy.DecorView
+ │    Leaking: NO (LinearLayout↓ is not leaking and View attached)
+ │    View#mParent is set
+ │    View#mAttachInfo is not null (view attached)
+ │    View.mWindowAttachCount=1
+ │    ↓ DecorView.mContentRoot
+ ├─ android.widget.LinearLayout
+ │    Leaking: NO (MainActivity↓ is not leaking and View attached)
+ │    View#mParent is set
+ │    View#mAttachInfo is not null (view attached)
+ │    View.mWindowAttachCount=1
+ │    ↓ LinearLayout.mContext
+ ├─ dev.williamreed.mapbox_nav_ui_leak.MainActivity
+ │    Leaking: NO (Activity#mDestroyed is false)
+ │    ↓ MainActivity.mLifecycleRegistry
+ │                   ~~~~~~~~~~~~~~~~~~
+ ├─ androidx.lifecycle.LifecycleRegistry
+ │    Leaking: UNKNOWN
+ │    ↓ LifecycleRegistry.mObserverMap
+ │                        ~~~~~~~~~~~~
+ ├─ androidx.arch.core.internal.FastSafeIterableMap
+ │    Leaking: UNKNOWN
+ │    ↓ FastSafeIterableMap.mEnd
+ │                          ~~~~
+ ├─ androidx.arch.core.internal.SafeIterableMap$Entry
+ │    Leaking: UNKNOWN
+ │    ↓ SafeIterableMap$Entry.mKey
+ │                            ~~~~
+ ├─ androidx.lifecycle.LiveData$LifecycleBoundObserver
+ │    Leaking: UNKNOWN
+ │    ↓ LiveData$LifecycleBoundObserver.mObserver
+ │                                      ~~~~~~~~~
+ ├─ com.mapbox.services.android.navigation.ui.v5.NavigationViewSubscriber$4
+ │    Leaking: UNKNOWN
+ │    Anonymous class implementing androidx.lifecycle.Observer
+ │    ↓ NavigationViewSubscriber$4.this$0
+ │                                 ~~~~~~
+ ├─ com.mapbox.services.android.navigation.ui.v5.NavigationViewSubscriber
+ │    Leaking: UNKNOWN
+ │    ↓ NavigationViewSubscriber.navigationPresenter
+ │                               ~~~~~~~~~~~~~~~~~~~
+ ├─ com.mapbox.services.android.navigation.ui.v5.NavigationPresenter
+ │    Leaking: UNKNOWN
+ │    ↓ NavigationPresenter.view
+ │                          ~~~~
+ ├─ com.mapbox.services.android.navigation.ui.v5.NavigationView
+ │    Leaking: YES (View detached and has parent)
+ │    View#mParent is set
+ │    View#mAttachInfo is null (view detached)
+ │    View.mWindowAttachCount=1
+ │    ↓ NavigationView.mParent
+ ╰→ android.widget.FrameLayout
+ ​     Leaking: YES (RefWatcher was watching this)
+ ​     View#mParent is null
+ ​     View#mAttachInfo is null (view detached)
+ ​     View.mWindowAttachCount=1
+ , retainedHeapSize=null), LeakingInstance(referenceKey=3aa4ee09-d717-4f92-9f55-a89a2bb471a3, referenceName=, instanceClassName=dev.williamreed.mapbox_nav_ui_leak.NavFragment, watchDurationMillis=12382, retainedDurationMillis=4894, exclusionStatus=null, leakTrace=
+ ┬
+ ├─ android.view.inputmethod.InputMethodManager
+ │    Leaking: NO (it's a GC root and a class is never leaking)
+ │    ↓ static InputMethodManager.sInstance
+ ├─ android.view.inputmethod.InputMethodManager
+ │    Leaking: NO (DecorView↓ is not leaking and InputMethodManager is a singleton)
+ │    ↓ InputMethodManager.mNextServedView
+ ├─ com.android.internal.policy.DecorView
+ │    Leaking: NO (LinearLayout↓ is not leaking and View attached)
+ │    View#mParent is set
+ │    View#mAttachInfo is not null (view attached)
+ │    View.mWindowAttachCount=1
+ │    ↓ DecorView.mContentRoot
+ ├─ android.widget.LinearLayout
+ │    Leaking: NO (MainActivity↓ is not leaking and View attached)
+ │    View#mParent is set
+ │    View#mAttachInfo is not null (view attached)
+ │    View.mWindowAttachCount=1
+ │    ↓ LinearLayout.mContext
+ ├─ dev.williamreed.mapbox_nav_ui_leak.MainActivity
+ │    Leaking: NO (Activity#mDestroyed is false)
+ │    ↓ MainActivity.mLifecycleRegistry
+ │                   ~~~~~~~~~~~~~~~~~~
+ ├─ androidx.lifecycle.LifecycleRegistry
+ │    Leaking: UNKNOWN
+ │    ↓ LifecycleRegistry.mObserverMap
+ │                        ~~~~~~~~~~~~
+ ├─ androidx.arch.core.internal.FastSafeIterableMap
+ │    Leaking: UNKNOWN
+ │    ↓ FastSafeIterableMap.mEnd
+ │                          ~~~~
+ ├─ androidx.arch.core.internal.SafeIterableMap$Entry
+ │    Leaking: UNKNOWN
+ │    ↓ SafeIterableMap$Entry.mKey
+ │                            ~~~~
+ ├─ androidx.lifecycle.LiveData$LifecycleBoundObserver
+ │    Leaking: UNKNOWN
+ │    ↓ LiveData$LifecycleBoundObserver.mObserver
+ │                                      ~~~~~~~~~
+ ├─ com.mapbox.services.android.navigation.ui.v5.NavigationViewSubscriber$4
+ │    Leaking: UNKNOWN
+ │    Anonymous class implementing androidx.lifecycle.Observer
+ │    ↓ NavigationViewSubscriber$4.this$0
+ │                                 ~~~~~~
+ ├─ com.mapbox.services.android.navigation.ui.v5.NavigationViewSubscriber
+ │    Leaking: UNKNOWN
+ │    ↓ NavigationViewSubscriber.navigationPresenter
+ │                               ~~~~~~~~~~~~~~~~~~~
+ ├─ com.mapbox.services.android.navigation.ui.v5.NavigationPresenter
+ │    Leaking: UNKNOWN
+ │    ↓ NavigationPresenter.view
+ │                          ~~~~
+ ├─ com.mapbox.services.android.navigation.ui.v5.NavigationView
+ │    Leaking: YES (View detached and has parent)
+ │    View#mParent is set
+ │    View#mAttachInfo is null (view detached)
+ │    View.mWindowAttachCount=1
+ │    ↓ NavigationView.onNavigationReadyCallback
+ ╰→ dev.williamreed.mapbox_nav_ui_leak.NavFragment
+ ​     Leaking: YES (RefWatcher was watching this and Fragment#mFragmentManager is null and Fragment#mFragmentManager is null)
+ , retainedHeapSize=null)])
+```
