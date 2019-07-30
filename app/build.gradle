@@ -35,4 +35,5 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:8.2.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.41.0'
 
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-alpha-3'
 }

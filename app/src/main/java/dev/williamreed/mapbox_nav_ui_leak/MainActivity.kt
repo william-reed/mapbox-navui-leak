@@ -28,9 +28,4 @@ class MainActivity : AppCompatActivity(), HomeFragment.HomeFragmentCallbacks {
         }
     }
 
-//    override fun onBackPressed() {
-//        if (!supportFragmentManager.popBackStackImmediate()) {
-//            super.onBackPressed()
-//        }
-//    }
 }
